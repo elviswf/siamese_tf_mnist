@@ -42,31 +42,32 @@ if os.path.isfile(model_ckpt):
     if input_var == 'yes':
         new = False
 
-# start training
-if new:
-    for step in range(100000):
-        batch_x1, batch_y1 = mnist.train.next_batch(128)
-        batch_x2, batch_y2 = mnist.train.next_batch(128)
-        batch_y = (batch_y1 == batch_y2).astype('float')
-
-        _, loss_v = sess.run([train_step, siamese.loss], feed_dict={
-            siamese.x1: batch_x1,
-            siamese.x2: batch_x2,
-            siamese.y_: batch_y})
-
-        if np.isnan(loss_v):
-            print('Model diverged with loss = NaN')
-            quit()
-
-        if step % 10 == 0:
-            print('step %d: loss %.3f' % (step, loss_v))
-
-        if step % 1000 == 0 and step > 0:
-            saver.save(sess, 'model.ckpt')
-            embed = siamese.o1.eval({siamese.x1: mnist.test.images})
-            embed.tofile('embed.txt')
-else:
+if not new:
     saver.restore(sess, 'model.ckpt')
+
+# start training
+for step in range(100000):
+    batch_x1, batch_y1 = mnist.train.next_batch(128)
+    batch_x2, batch_y2 = mnist.train.next_batch(128)
+    batch_y = (batch_y1 == batch_y2).astype('float')
+
+    _, loss_v = sess.run([train_step, siamese.loss], feed_dict={
+        siamese.x1: batch_x1,
+        siamese.x2: batch_x2,
+        siamese.y_: batch_y})
+
+    if np.isnan(loss_v):
+        print('Model diverged with loss = NaN')
+        quit()
+
+    if step % 10 == 0:
+        print('step %d: loss %.3f' % (step, loss_v))
+
+    if step % 1000 == 0 and step > 0:
+        saver.save(sess, 'model.ckpt')
+        embed = siamese.o1.eval({siamese.x1: mnist.test.images})
+        embed.tofile('embed.txt')
+
 
 # visualize result
 x_test = mnist.test.images.reshape([-1, 28, 28])

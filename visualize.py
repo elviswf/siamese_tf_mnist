@@ -1,6 +1,9 @@
 from tensorflow.examples.tutorials.mnist import input_data
-
+import sys
 import numpy as np
+if 'linux' in sys.platform:
+    import matplotlib
+    matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import offsetbox
 
@@ -34,6 +37,7 @@ def visualize(embed, x_test):
     # plt.xticks([]), plt.yticks([])
     plt.title('Embedding from the last layer of the network')
     plt.show()
+    plt.savefig('result_2.png')
 
 
 if __name__ == "__main__":
