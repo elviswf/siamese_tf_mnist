@@ -1,4 +1,3 @@
-
 """ Siamese implementation using Tensorflow with MNIST example.
 This siamese network embeds a 28x28 image (a point in 784D) 
 into a point in 2D.
@@ -10,13 +9,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-#import system things
-from tensorflow.examples.tutorials.mnist import input_data # for data
+# import system things
+from tensorflow.examples.tutorials.mnist import input_data  # for data
 import tensorflow as tf
 import numpy as np
 import os
 
-#import helpers
+# import helpers
 import inference
 import visualize
 
@@ -25,7 +24,7 @@ mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 sess = tf.InteractiveSession()
 
 # setup siamese network
-siamese = inference.siamese();
+siamese = inference.siamese()
 train_step = tf.train.GradientDescentOptimizer(0.01).minimize(siamese.loss)
 saver = tf.train.Saver()
 tf.initialize_all_variables().run()
@@ -48,16 +47,16 @@ if new:
         batch_y = (batch_y1 == batch_y2).astype('float')
 
         _, loss_v = sess.run([train_step, siamese.loss], feed_dict={
-                            siamese.x1: batch_x1, 
-                            siamese.x2: batch_x2, 
-                            siamese.y_: batch_y})
+            siamese.x1: batch_x1,
+            siamese.x2: batch_x2,
+            siamese.y_: batch_y})
 
         if np.isnan(loss_v):
             print('Model diverged with loss = NaN')
             quit()
 
         if step % 10 == 0:
-            print ('step %d: loss %.3f' % (step, loss_v))
+            print('step %d: loss %.3f' % (step, loss_v))
 
         if step % 1000 == 0 and step > 0:
             saver.save(sess, 'model.ckpt')

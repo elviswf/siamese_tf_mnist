@@ -1,7 +1,7 @@
-import tensorflow as tf 
+import tensorflow as tf
+
 
 class siamese:
-
     # Create model
     def __init__(self):
         self.x1 = tf.placeholder(tf.float32, [None, 784])
@@ -29,18 +29,19 @@ class siamese:
         assert len(bottom.get_shape()) == 2
         n_prev_weight = bottom.get_shape()[1]
         initer = tf.truncated_normal_initializer(stddev=0.01)
-        W = tf.get_variable(name+'W', dtype=tf.float32, shape=[n_prev_weight, n_weight], initializer=initer)
-        b = tf.get_variable(name+'b', dtype=tf.float32, initializer=tf.constant(0.01, shape=[n_weight], dtype=tf.float32))
+        W = tf.get_variable(name + 'W', dtype=tf.float32, shape=[n_prev_weight, n_weight], initializer=initer)
+        b = tf.get_variable(name + 'b', dtype=tf.float32,
+                            initializer=tf.constant(0.01, shape=[n_weight], dtype=tf.float32))
         fc = tf.nn.bias_add(tf.matmul(bottom, W), b)
         return fc
 
     def loss_with_spring(self):
         margin = 5.0
         labels_t = self.y_
-        labels_f = tf.sub(1.0, self.y_, name="1-yi")          # labels_ = !labels;
+        labels_f = tf.sub(1.0, self.y_, name="1-yi")  # labels_ = !labels;
         eucd2 = tf.pow(tf.sub(self.o1, self.o2), 2)
         eucd2 = tf.reduce_sum(eucd2, 1)
-        eucd = tf.sqrt(eucd2+1e-6, name="eucd")
+        eucd = tf.sqrt(eucd2 + 1e-6, name="eucd")
         C = tf.constant(margin, name="C")
         # yi*||CNN(p1i)-CNN(p2i)||^2 + (1-yi)*max(0, C-||CNN(p1i)-CNN(p2i)||^2)
         pos = tf.mul(labels_t, eucd2, name="yi_x_eucd2")
@@ -54,10 +55,10 @@ class siamese:
     def loss_with_step(self):
         margin = 5.0
         labels_t = self.y_
-        labels_f = tf.sub(1.0, self.y_, name="1-yi")          # labels_ = !labels;
+        labels_f = tf.sub(1.0, self.y_, name="1-yi")  # labels_ = !labels;
         eucd2 = tf.pow(tf.sub(self.o1, self.o2), 2)
         eucd2 = tf.reduce_sum(eucd2, 1)
-        eucd = tf.sqrt(eucd2+1e-6, name="eucd")
+        eucd = tf.sqrt(eucd2 + 1e-6, name="eucd")
         C = tf.constant(margin, name="C")
         pos = tf.mul(labels_t, eucd, name="y_x_eucd")
         neg = tf.mul(labels_f, tf.maximum(0.0, tf.sub(C, eucd)), name="Ny_C-eucd")
