@@ -21,7 +21,10 @@ import visualize
 
 # prepare data and tf.session
 mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
-sess = tf.InteractiveSession()
+
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.4
+sess = tf.InteractiveSession(config=config)
 
 # setup siamese network
 siamese = inference.siamese()
